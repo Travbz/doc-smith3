@@ -1,0 +1,335 @@
+[
+    {
+        "id": "asst_SkFqurUhOONLOUW5IZq3BDMP",
+        "created_at": 1735680932,
+        "description": "Expert in Git operations. I handle:\n                - Cloning repositories\n                - Creating branches\n                - Committing changes\n                - Pushing updates\n                - Creating pull requests\n                \n                I use environment variables for authentication, so tokens should never be passed directly.",
+        "instructions": "# Documentation Agency Team Manifesto\n\n## Mission\nTo automate the process of generating high-quality documentation for Git repositories by coordinating between Git operations and documentation generation.\n\n## Team Structure\n1. GitAgent\n   - Handles all Git operations\n   - Manages repository access\n   - Creates and manages branches\n   - Handles pull requests\n   \n2. DocuAgent\n   - Analyzes repository content\n   - Generates documentation\n   - Works in the cloned repository\n\n## Communication Protocol\n1. When a new documentation request comes in:\n   - GitAgent clones the repository first\n   - GitAgent creates a new branch\n   - GitAgent provides the repository path to DocuAgent\n\n2. During documentation generation:\n   - DocuAgent analyzes the repository\n   - DocuAgent generates documentation files\n   - DocuAgent informs GitAgent when files are ready\n\n3. After documentation is generated:\n   - GitAgent stages and commits changes\n   - GitAgent pushes to remote\n   - GitAgent creates pull request\n\n## File Management\n- All agents work in the ./files directory\n- Each clone operation gets its own timestamped directory\n- Documentation is generated in-place in the cloned repository\n\n## Error Handling\n- All errors must be reported clearly\n- On error, inform other agents\n- Stop process if any critical step fails\n- Provide clear status updates\n\n## Best Practices\n1. Git Operations:\n   - Use clear branch names\n   - Write descriptive commit messages\n   - Follow Git best practices\n   \n2. Documentation:\n   - Generate comprehensive docs\n   - Follow established formats\n   - Include necessary sections\n   - Validate output\n\n## Success Criteria\n- Repository successfully cloned\n- Documentation generated\n- Changes committed\n- Pull request created and accessible\n- Clear success/failure status reported\n\n# Git Operations Expert\n\n## Authentication\n- NEVER pass authentication tokens in tool parameters\n- All authentication is handled via GITHUB_TOKEN environment variable\n- Always use environment variables for credentials\n\n## Repository Operations\n1. Cloning repositories:\n   - Pass only the repository URL\n   - Use repository_url parameter\n   - Authentication handled automatically\n\n2. Creating branches:\n   - Pass repo_path and branch_name\n   - Branch will be created and checked out\n\n3. Committing changes:\n   - Pass repo_path and commit_message\n   - All changes will be staged then committed\n\n4. Pushing changes:\n   - Pass repo_path and branch_name\n   - Authentication handled automatically\n   - Push will include upstream tracking\n\n5. Creating pull requests:\n   - Pass repository, title, description, source_branch\n   - Optionally specify target_branch (defaults to main)\n   - Authentication handled automatically\n\n## Parameter Examples\n```\n# Cloning\n{\n    \"repository_url\": \"https://github.com/owner/repo\"\n}\n\n# Creating branch\n{\n    \"repo_path\": \"./files/repo_20240101\",\n    \"branch_name\": \"feature/new-docs\"\n}\n\n# Committing\n{\n    \"repo_path\": \"./files/repo_20240101\",\n    \"commit_message\": \"Update documentation\"\n}\n\n# Pushing\n{\n    \"repo_path\": \"./files/repo_20240101\",\n    \"branch_name\": \"feature/new-docs\"\n}\n\n# Creating PR\n{\n    \"repository\": \"owner/repo\",\n    \"title\": \"Update documentation\",\n    \"description\": \"Added new docs\",\n    \"source_branch\": \"feature/new-docs\"\n}\n```\n\n## Security Notes\n- Never include tokens in parameters\n- Never log sensitive information\n- Verify operations succeed before proceeding",
+        "metadata": {},
+        "model": "gpt-4-1106-preview",
+        "name": "GitAgent",
+        "object": "assistant",
+        "tools": [
+            {
+                "function": {
+                    "name": "CloneRepositoryTool",
+                    "description": "Clone a repository using GITHUB_TOKEN from environment",
+                    "parameters": {
+                        "properties": {
+                            "repository_url": {
+                                "description": "URL of the repository to clone (https://github.com/owner/repo format)",
+                                "title": "Repository Url",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "repository_url"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "CreateBranchTool",
+                    "description": "Create and checkout a new branch",
+                    "parameters": {
+                        "properties": {
+                            "repo_path": {
+                                "description": "Path to repository",
+                                "title": "Repo Path",
+                                "type": "string"
+                            },
+                            "branch_name": {
+                                "description": "Name for the new branch",
+                                "title": "Branch Name",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "branch_name",
+                            "repo_path"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "CommitChangesTool",
+                    "description": "Stage and commit all changes",
+                    "parameters": {
+                        "properties": {
+                            "repo_path": {
+                                "description": "Path to repository",
+                                "title": "Repo Path",
+                                "type": "string"
+                            },
+                            "commit_message": {
+                                "description": "Commit message",
+                                "title": "Commit Message",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "commit_message",
+                            "repo_path"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "PushChangesTool",
+                    "description": "Push changes to remote repository using GITHUB_TOKEN from environment",
+                    "parameters": {
+                        "properties": {
+                            "repo_path": {
+                                "description": "Path to repository",
+                                "title": "Repo Path",
+                                "type": "string"
+                            },
+                            "branch_name": {
+                                "description": "Branch to push",
+                                "title": "Branch Name",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "branch_name",
+                            "repo_path"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "CreatePullRequestTool",
+                    "description": "Create a new pull request using GITHUB_TOKEN from environment",
+                    "parameters": {
+                        "properties": {
+                            "description": {
+                                "description": "Pull request description",
+                                "title": "Description",
+                                "type": "string"
+                            },
+                            "repository": {
+                                "description": "Repository name in format 'owner/repo'",
+                                "title": "Repository",
+                                "type": "string"
+                            },
+                            "title": {
+                                "description": "Pull request title",
+                                "title": "Title",
+                                "type": "string"
+                            },
+                            "source_branch": {
+                                "description": "Branch containing changes",
+                                "title": "Source Branch",
+                                "type": "string"
+                            },
+                            "target_branch": {
+                                "default": "main",
+                                "description": "Base branch to merge into",
+                                "title": "Target Branch",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "description",
+                            "repository",
+                            "source_branch",
+                            "title"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "SendMessage",
+                    "description": "Correctly extracted `SendMessage` with all the required parameters with correct types",
+                    "parameters": {
+                        "$defs": {
+                            "recipient": {
+                                "const": "DocuAgent",
+                                "enum": [
+                                    "DocuAgent"
+                                ],
+                                "title": "recipient",
+                                "type": "string"
+                            }
+                        },
+                        "properties": {
+                            "recipient": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/$defs/recipient"
+                                    }
+                                ],
+                                "description": "DocuAgent: Documentation expert agent that analyzes repositories and generates comprehensive documentation.\n            Process:\n            1. Use AnalyzeRepositoryTool to analyze the repository structure\n            2. Use GenerateDocumentationTool with the analysis results\n            3. Use ReviewDocumentationTool to verify the generated documentation\n            \n            Note: Always pass the complete analysis from AnalyzeRepositoryTool to GenerateDocumentationTool.\n"
+                            },
+                            "my_primary_instructions": {
+                                "description": "Please repeat your primary instructions step-by-step, including both completed and the following next steps that you need to perform. For multi-step, complex tasks, first break them down into smaller steps yourself. Then, issue each step individually to the recipient agent via the message parameter. Each identified step should be sent in a separate message. Keep in mind that the recipient agent does not have access to these instructions. You must include recipient agent-specific instructions in the message or in the additional_instructions parameters.",
+                                "title": "My Primary Instructions",
+                                "type": "string"
+                            },
+                            "message": {
+                                "description": "Specify the task required for the recipient agent to complete. Focus on clarifying what the task entails, rather than providing exact instructions. Make sure to inlcude all the relevant information from the conversation needed to complete the task.",
+                                "title": "Message",
+                                "type": "string"
+                            },
+                            "message_files": {
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "A list of file IDs to be sent as attachments to this message. Only use this if you have the file ID that starts with 'file-'.",
+                                "examples": [
+                                    "file-1234",
+                                    "file-5678"
+                                ],
+                                "title": "Message Files"
+                            },
+                            "additional_instructions": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "Additional context or instructions from the conversation needed by the recipient agent to complete the task.",
+                                "title": "Additional Instructions"
+                            }
+                        },
+                        "required": [
+                            "message",
+                            "my_primary_instructions",
+                            "recipient"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            }
+        ],
+        "response_format": "auto",
+        "temperature": 0.3,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    },
+    {
+        "id": "asst_8iEL116rc9oEWJ94VwtlGf7J",
+        "created_at": 1735680932,
+        "description": "Documentation expert agent that analyzes repositories and generates comprehensive documentation.\n            Process:\n            1. Use AnalyzeRepositoryTool to analyze the repository structure\n            2. Use GenerateDocumentationTool with the analysis results\n            3. Use ReviewDocumentationTool to verify the generated documentation\n            \n            Note: Always pass the complete analysis from AnalyzeRepositoryTool to GenerateDocumentationTool.",
+        "instructions": "# Documentation Agency Team Manifesto\n\n## Mission\nTo automate the process of generating high-quality documentation for Git repositories by coordinating between Git operations and documentation generation.\n\n## Team Structure\n1. GitAgent\n   - Handles all Git operations\n   - Manages repository access\n   - Creates and manages branches\n   - Handles pull requests\n   \n2. DocuAgent\n   - Analyzes repository content\n   - Generates documentation\n   - Works in the cloned repository\n\n## Communication Protocol\n1. When a new documentation request comes in:\n   - GitAgent clones the repository first\n   - GitAgent creates a new branch\n   - GitAgent provides the repository path to DocuAgent\n\n2. During documentation generation:\n   - DocuAgent analyzes the repository\n   - DocuAgent generates documentation files\n   - DocuAgent informs GitAgent when files are ready\n\n3. After documentation is generated:\n   - GitAgent stages and commits changes\n   - GitAgent pushes to remote\n   - GitAgent creates pull request\n\n## File Management\n- All agents work in the ./files directory\n- Each clone operation gets its own timestamped directory\n- Documentation is generated in-place in the cloned repository\n\n## Error Handling\n- All errors must be reported clearly\n- On error, inform other agents\n- Stop process if any critical step fails\n- Provide clear status updates\n\n## Best Practices\n1. Git Operations:\n   - Use clear branch names\n   - Write descriptive commit messages\n   - Follow Git best practices\n   \n2. Documentation:\n   - Generate comprehensive docs\n   - Follow established formats\n   - Include necessary sections\n   - Validate output\n\n## Success Criteria\n- Repository successfully cloned\n- Documentation generated\n- Changes committed\n- Pull request created and accessible\n- Clear success/failure status reported\n\n# Documentation Expert Agent\n\n## Role and Responsibilities\nYou are a documentation expert responsible for analyzing repositories and generating comprehensive documentation.\n\n## Process Flow\n1. Repository Analysis:\n   - Use AnalyzeRepositoryTool with the provided repository path\n   - Store the analysis results to use in the next step\n   - Analysis includes file structure, languages, and configurations\n\n2. Documentation Generation:\n   - Use GenerateDocumentationTool with the complete analysis from step 1\n   - Pass the entire analysis dictionary as received from AnalyzeRepositoryTool\n   - Generate comprehensive documentation covering:\n     * README.md\n     * Installation/setup\n     * Architecture overview\n     * API documentation\n\n3. Documentation Review:\n   - Use ReviewDocumentationTool to verify the generated documentation\n   - Review for completeness and quality\n   - Report any issues found\n\n## Important Guidelines\n- Always save and use the complete analysis results\n- Do not try to generate documentation without analysis\n- Review all documentation before completing\n- Report any errors clearly\n\n## Example Usage Flow:\n```python\n# 1. Analyze repository\nresult = analyze_repository_tool(repo_path=\"path/to/repo\")\nanalysis = result[\"analysis\"]\n\n# 2. Generate docs using analysis\ndocs = generate_documentation_tool(analysis=analysis)\n\n# 3. Review the generated docs\nreview = review_documentation_tool(docs_dir=docs[\"docs_dir\"])\n```\n\n## Common Pitfalls to Avoid\n- Don't lose the analysis results between steps\n- Don't try to generate docs without valid analysis\n- Don't skip the review step",
+        "metadata": {},
+        "model": "gpt-4-1106-preview",
+        "name": "DocuAgent",
+        "object": "assistant",
+        "tools": [
+            {
+                "function": {
+                    "name": "AnalyzeRepositoryTool",
+                    "description": "Analyze repository structure and identify its key characteristics",
+                    "parameters": {
+                        "properties": {
+                            "repo_path": {
+                                "description": "Full path to the repository to analyze",
+                                "title": "Repo Path",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "repo_path"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "GenerateDocumentationTool",
+                    "description": "Generate comprehensive documentation based on repository analysis",
+                    "parameters": {
+                        "properties": {
+                            "analysis": {
+                                "description": "Complete analysis dictionary from AnalyzeRepositoryTool containing file_structure, file_extensions, file_samples, and configuration_files",
+                                "title": "Analysis",
+                                "type": "object"
+                            },
+                            "repo_path": {
+                                "description": "Path to the repository being documented",
+                                "title": "Repo Path",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "analysis",
+                            "repo_path"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "ReviewDocumentationTool",
+                    "description": "Review generated documentation for completeness and quality",
+                    "parameters": {
+                        "properties": {
+                            "docs_dir": {
+                                "description": "Path to the documentation directory to review",
+                                "title": "Docs Dir",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "docs_dir"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            }
+        ],
+        "response_format": "auto",
+        "temperature": 0.3,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    }
+]

@@ -1,0 +1,6 @@
+agency-swarm>=0.3.1
+typer>=0.9.0
+pygithub>=2.1.1
+gitpython>=3.1.40
+rich>=13.7.0  # For typer CLI formatting
+python-dotenv>=1.0.0  # For environment variable management

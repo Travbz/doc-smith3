@@ -35,16 +35,67 @@
                     "name": "GenerateDocumentationTool",
                     "description": "Documentation generator that leverages LLM capabilities",
                     "parameters": {
-                        "properties": {
-                            "analysis": {
-                                "description": "Complete repository analysis from AnalyzeRepositoryTool",
-                                "title": "Analysis",
+                        "$defs": {
+                            "FileAnalysis": {
+                                "description": "Structure for analyzed file information",
+                                "properties": {
+                                    "path": {
+                                        "title": "Path",
+                                        "type": "string"
+                                    },
+                                    "content": {
+                                        "title": "Content",
+                                        "type": "string"
+                                    },
+                                    "size": {
+                                        "title": "Size",
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "path",
+                                    "content",
+                                    "size"
+                                ],
+                                "title": "FileAnalysis",
                                 "type": "object"
                             },
+                            "RepositoryAnalysis": {
+                                "description": "Complete repository analysis structure",
+                                "properties": {
+                                    "files": {
+                                        "items": {
+                                            "$ref": "#/$defs/FileAnalysis"
+                                        },
+                                        "title": "Files",
+                                        "type": "array"
+                                    },
+                                    "repo_path": {
+                                        "title": "Repo Path",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "files",
+                                    "repo_path"
+                                ],
+                                "title": "RepositoryAnalysis",
+                                "type": "object"
+                            }
+                        },
+                        "properties": {
                             "repo_path": {
                                 "description": "Repository path",
                                 "title": "Repo Path",
                                 "type": "string"
+                            },
+                            "analysis": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/$defs/RepositoryAnalysis"
+                                    }
+                                ],
+                                "description": "Analysis results from AnalyzeRepositoryTool"
                             },
                             "review_feedback": {
                                 "anyOf": [

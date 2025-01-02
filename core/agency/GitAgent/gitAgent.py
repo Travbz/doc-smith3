@@ -7,6 +7,7 @@ from .tools.git_tools import (
     CreatePullRequestTool
 )
 import os
+from datetime import datetime
 from ..settings.settings import GIT_AGENT_ID, DEFAULT_MODEL, AGENT_SETTINGS, GITHUB_TOKEN
 
 class GitAgent(Agent):
@@ -25,7 +26,7 @@ class GitAgent(Agent):
                 - Pushing updates
                 - Creating pull requests
                 
-                I use settings or environment variables for authentication.""",
+                I automatically add timestamps to branch names and use environment variables for authentication.""",
             instructions="instructions.md",
             tools=[
                 CloneRepositoryTool,
@@ -38,3 +39,9 @@ class GitAgent(Agent):
             temperature=AGENT_SETTINGS.get("temperature", 0.3),
             id=GIT_AGENT_ID
         )
+    
+    def create_timestamped_branch_name(self, base_name: str) -> str:
+        """Create a branch name with timestamp"""
+        # Format: docs/update-docs-YYYYMMDD-HHMM
+        timestamp = datetime.now().strftime('%Y%m%d-%H%M')
+        return f"{base_name}-{timestamp}"

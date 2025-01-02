@@ -1,8 +1,7 @@
 from agency_swarm import Agent
 from .tools.documentation_tools import (
     AnalyzeRepositoryTool,
-    GenerateDocumentationTool,
-    ReviewDocumentationTool
+    GenerateDocumentationTool
 )
 
 class DocuAgent(Agent):
@@ -11,18 +10,11 @@ class DocuAgent(Agent):
     def __init__(self):
         super().__init__(
             name="DocuAgent",
-            description="""Documentation expert agent that analyzes repositories and generates comprehensive documentation.
-            Process:
-            1. Use AnalyzeRepositoryTool to analyze the repository structure
-            2. Use GenerateDocumentationTool with the analysis results
-            3. Use ReviewDocumentationTool to verify the generated documentation
-            
-            Note: Always pass the complete analysis from AnalyzeRepositoryTool to GenerateDocumentationTool.""",
+            description="Documentation expert agent that analyzes repositories and generates comprehensive documentation. Specializes in repository analysis, documentation generation, and quality review using LLM capabilities.",
             instructions="instructions.md",
             tools=[
                 AnalyzeRepositoryTool,
-                GenerateDocumentationTool,
-                ReviewDocumentationTool
+                GenerateDocumentationTool
             ],
             model="gpt-4-1106-preview"
         )

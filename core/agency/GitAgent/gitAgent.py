@@ -7,13 +7,14 @@ from .tools.git_tools import (
     CreatePullRequestTool
 )
 import os
+from ..settings.settings import GIT_AGENT_ID, DEFAULT_MODEL, AGENT_SETTINGS, GITHUB_TOKEN
 
 class GitAgent(Agent):
     def __init__(self):
         # Validate GitHub token
-        github_token = os.getenv("GITHUB_TOKEN")
+        github_token = GITHUB_TOKEN or os.getenv("GITHUB_TOKEN")
         if not github_token:
-            raise ValueError("GITHUB_TOKEN environment variable must be set")
+            raise ValueError("GITHUB_TOKEN must be set in settings or environment")
 
         super().__init__(
             name="GitAgent",
@@ -24,7 +25,7 @@ class GitAgent(Agent):
                 - Pushing updates
                 - Creating pull requests
                 
-                I use environment variables for authentication, so tokens should never be passed directly.""",
+                I use settings or environment variables for authentication.""",
             instructions="instructions.md",
             tools=[
                 CloneRepositoryTool,
@@ -33,5 +34,7 @@ class GitAgent(Agent):
                 PushChangesTool,
                 CreatePullRequestTool
             ],
-            model="gpt-4-1106-preview"
+            model=AGENT_SETTINGS.get("model", DEFAULT_MODEL),
+            temperature=AGENT_SETTINGS.get("temperature", 0.3),
+            id=GIT_AGENT_ID
         )

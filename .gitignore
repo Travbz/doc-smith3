@@ -2,3 +2,15 @@ dir.sh
 setup.sh
 project-structure.txt
 files/*
+
+
+
+# All python cache files
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+#All venv files
+.venv/

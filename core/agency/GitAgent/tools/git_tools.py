@@ -6,44 +6,37 @@ from datetime import datetime
 from github import Github
 from typing import ClassVar, Dict, Optional
 from pydantic import Field
+from ...settings.settings import FILES_DIR, GITHUB_TOKEN
 
 class SafeFormatter:
     """Format strings while removing sensitive data"""
     @staticmethod
     def clean_sensitive_data(text: str) -> str:
         # Get token to remove
-        token = os.getenv("GITHUB_TOKEN", "")
+        token = GITHUB_TOKEN or os.getenv("GITHUB_TOKEN", "")
         if token and token in text:
             text = text.replace(token, "***")
         return text
 
 class CloneRepositoryTool(BaseTool):
-    """Clone a repository using GITHUB_TOKEN from environment"""
+    """Clone a repository using GITHUB_TOKEN from settings or environment"""
     name: ClassVar[str] = "clone_repository"
     description: ClassVar[str] = """Clone a GitHub repository.
-    Authentication is handled automatically using GITHUB_TOKEN from environment.
+    Authentication is handled automatically using GITHUB_TOKEN from settings/environment."""
     
-    Example:
-    ```python
-    result = clone_repository(repository_url="https://github.com/owner/repo")
-    repo_path = result["repo_path"]  # Save this for other operations
-    ```
-    """
-    
-    # Input parameter
     repository_url: str = Field(
         description="URL of the repository to clone (https://github.com/owner/repo format)"
     )
 
     def run(self) -> dict:
         try:
-            github_token = os.getenv("GITHUB_TOKEN")
+            github_token = GITHUB_TOKEN or os.getenv("GITHUB_TOKEN")
             if not github_token:
-                return {"success": False, "error": "GitHub token not found in environment"}
+                return {"success": False, "error": "GitHub token not found in settings or environment"}
 
             # Create files directory if it doesn't exist
-            files_dir = Path("files")
-            files_dir.mkdir(exist_ok=True)
+            files_dir = Path(FILES_DIR)
+            files_dir.mkdir(parents=True, exist_ok=True)
             
             # Create unique directory for this repo
             repo_name = self.repository_url.split('/')[-1].replace('.git', '')
@@ -80,24 +73,10 @@ class CloneRepositoryTool(BaseTool):
 class CreateBranchTool(BaseTool):
     """Create and checkout a new branch"""
     name: ClassVar[str] = "create_branch"
-    description: ClassVar[str] = """Create and checkout a new Git branch.
+    description: ClassVar[str] = "Create and checkout a new Git branch."
     
-    Example:
-    ```python
-    result = create_branch(
-        repo_path="/path/to/repo",
-        branch_name="feature/new-docs"
-    )
-    ```
-    """
-    
-    # Input parameters
-    repo_path: str = Field(
-        description="Path to repository"
-    )
-    branch_name: str = Field(
-        description="Name for the new branch"
-    )
+    repo_path: str = Field(description="Path to repository")
+    branch_name: str = Field(description="Name for the new branch")
 
     def run(self) -> dict:
         try:
@@ -121,24 +100,10 @@ class CreateBranchTool(BaseTool):
 class CommitChangesTool(BaseTool):
     """Stage and commit all changes"""
     name: ClassVar[str] = "commit_changes"
-    description: ClassVar[str] = """Stage and commit all changes in the repository.
+    description: ClassVar[str] = "Stage and commit all changes in the repository."
     
-    Example:
-    ```python
-    result = commit_changes(
-        repo_path="/path/to/repo",
-        commit_message="Update documentation"
-    )
-    ```
-    """
-    
-    # Input parameters
-    repo_path: str = Field(
-        description="Path to repository"
-    )
-    commit_message: str = Field(
-        description="Commit message"
-    )
+    repo_path: str = Field(description="Path to repository")
+    commit_message: str = Field(description="Commit message")
 
     def run(self) -> dict:
         try:
@@ -170,33 +135,19 @@ class CommitChangesTool(BaseTool):
             return {"success": False, "error": str(e)}
 
 class PushChangesTool(BaseTool):
-    """Push changes to remote repository using GITHUB_TOKEN from environment"""
+    """Push changes to remote repository using GITHUB_TOKEN from settings/environment"""
     name: ClassVar[str] = "push_changes"
     description: ClassVar[str] = """Push changes to remote repository.
-    Authentication is handled automatically using GITHUB_TOKEN from environment.
+    Authentication is handled automatically using GITHUB_TOKEN from settings/environment."""
     
-    Example:
-    ```python
-    result = push_changes(
-        repo_path="/path/to/repo",
-        branch_name="feature/new-docs"
-    )
-    ```
-    """
-    
-    # Input parameters
-    repo_path: str = Field(
-        description="Path to repository"
-    )
-    branch_name: str = Field(
-        description="Branch to push"
-    )
+    repo_path: str = Field(description="Path to repository")
+    branch_name: str = Field(description="Branch to push")
 
     def run(self) -> dict:
         try:
-            github_token = os.getenv("GITHUB_TOKEN")
+            github_token = GITHUB_TOKEN or os.getenv("GITHUB_TOKEN")
             if not github_token:
-                return {"success": False, "error": "GitHub token not found in environment"}
+                return {"success": False, "error": "GitHub token not found in settings or environment"}
 
             # Get the current remote URL
             remote_url = subprocess.run(
@@ -247,36 +198,15 @@ class PushChangesTool(BaseTool):
             return {"success": False, "error": error_msg}
 
 class CreatePullRequestTool(BaseTool):
-    """Create a new pull request using GITHUB_TOKEN from environment"""
+    """Create a new pull request using GITHUB_TOKEN from settings/environment"""
     name: ClassVar[str] = "create_pull_request"
     description: ClassVar[str] = """Create a new pull request.
-    Authentication is handled automatically using GITHUB_TOKEN from environment.
+    Authentication is handled automatically using GITHUB_TOKEN from settings/environment."""
     
-    Example:
-    ```python
-    result = create_pull_request(
-        repository="owner/repo",
-        title="Update documentation",
-        description="Added comprehensive documentation",
-        source_branch="feature/new-docs",
-        target_branch="main"  # Optional, defaults to main
-    )
-    ```
-    """
-    
-    # Input parameters
-    repository: str = Field(
-        description="Repository name in format 'owner/repo'"
-    )
-    title: str = Field(
-        description="Pull request title"
-    )
-    description: str = Field(
-        description="Pull request description"
-    )
-    source_branch: str = Field(
-        description="Branch containing changes"
-    )
+    repository: str = Field(description="Repository name in format 'owner/repo'")
+    title: str = Field(description="Pull request title")
+    description: str = Field(description="Pull request description")
+    source_branch: str = Field(description="Branch containing changes")
     target_branch: str = Field(
         default="main",
         description="Base branch to merge into"
@@ -284,9 +214,9 @@ class CreatePullRequestTool(BaseTool):
 
     def run(self) -> dict:
         try:
-            github_token = os.getenv("GITHUB_TOKEN")
+            github_token = GITHUB_TOKEN or os.getenv("GITHUB_TOKEN")
             if not github_token:
-                return {"success": False, "error": "GitHub token not found in environment"}
+                return {"success": False, "error": "GitHub token not found in settings or environment"}
 
             gh = Github(github_token)
             repo = gh.get_repo(self.repository)

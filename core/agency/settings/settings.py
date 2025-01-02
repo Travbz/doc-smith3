@@ -8,6 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 CEO_AGENT_ID = os.getenv("CEO_AGENT_ID")
 GIT_AGENT_ID = os.getenv("GIT_AGENT_ID")
 DOCU_AGENT_ID = os.getenv("DOCU_AGENT_ID")
+REVIEW_AGENT_ID = os.getenv("REVIEW_AGENT_ID")  # Added Review Agent ID
 
 # OpenAI Configuration
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -43,5 +44,6 @@ DEPENDENCY_FILES = {
 AGENT_SETTINGS = {
     "temperature": 0.3,
     "model": DEFAULT_MODEL,
+    "max_prompt_tokens": 25000,
     "files_folder": str(FILES_DIR),
 }
